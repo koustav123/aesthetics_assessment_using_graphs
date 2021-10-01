@@ -43,6 +43,7 @@ feature_file = h5py.File(os.path.join(args.save_feat, args.feature_file_name), '
 
 # name the groups for storing 8 augmented inputs for a single input
 data_groups = ['%d_%d_%d' % (i, j, k) for i in [0, 1] for j in [0, 1] for k in [0, 1]]
+# data_groups = data_groups[0:1]
 _ = [feature_file.create_group(g) for g in data_groups]
 
 # function to resize the smaller dimension to 5

@@ -11,7 +11,7 @@ def load(args, dset_classes):
                 # Specify the particular baseline model
                 model = getattr(Graph_Models, args.model_name)(args)
         else:
-            print('Wrong model specified: %s' % (args.basemodel))
+            print('Wrong model specified: %s' % (args.base_model))
             exit(1)
     else:
         print('Wrong id specified: %s' % (args.id))

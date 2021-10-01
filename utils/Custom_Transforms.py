@@ -1,5 +1,7 @@
 from torchvision import transforms
 import torch
+from PIL import Image
+import pdb
 
 class MLSP_FULL(object):
     def __init__(self, data_precision, MEAN, STD):
@@ -8,8 +10,13 @@ class MLSP_FULL(object):
         self.std = STD
 
     def __call__(self, img):
-        #pdb.set_trace()
+        # pdb.set_trace()
         w, h = img.size
+        if h < 139:
+            h_1 = 139
+            w_1 = int(h_1 * w/h)
+            img = img.resize((w_1, h_1), resample = Image.NEAREST)
+            w, h = img.size
         new_w, new_h = int(.875 * w), int(.875 * h)
         # un-comment next line only for nasnetlarge
         new_w, new_h = new_w - new_w % 16, new_h - new_h % 16

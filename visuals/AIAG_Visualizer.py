@@ -57,8 +57,8 @@ class A2_Visualizer(MTL_Visualizer):
         self.plot_mos(torch.FloatTensor(self.y_true_A2_mean)[self.rand_int_for_mos[:1000]].numpy(), \
         torch.FloatTensor(self.y_preds_A2_mean)[self.rand_int_for_mos[:1000]].numpy())
         self.add_figure('A2/MOS_MEAN' + phase, scatter_mos_mean, epoch)
-
-
+        self.add_figure('A2/Avg_Score_Dist_' + phase, self.score_dist_avg, epoch)
+        self.add_figure('A2/Score_Dist_5_' + phase, self.score_dist_5, epoch)
 
     def update_running_results(self, iter_results, phase):
         #pdb.set_trace()
@@ -70,7 +70,8 @@ class A2_Visualizer(MTL_Visualizer):
         self.y_preds_A2_mean += iter_results['y_preds_A2_mean']     
         self.y_true_A2_std += iter_results['y_true_A2_std']
         self.y_preds_A2_std += iter_results['y_preds_A2_std']
-
+        self.y_true += iter_results['y_true']
+        self.y_preds += iter_results['y_preds']
         # self.running_loss_P1 += iter_results['loss_P1'].data
         # self.y_true_P1 += iter_results['y_true_P1']
         # self.y_preds_P1 += iter_results['y_preds_P1']
@@ -98,6 +99,7 @@ class A2_Visualizer(MTL_Visualizer):
         self.epoch_f_A2 = f1_score((np.array(self.y_true_A2_mean) > 5).astype(int), (np.array(self.y_preds_A2_mean)>acc_t).astype(int))
         self.cm_A2 = confusion_matrix((np.array(self.y_true_A2_mean) > 5).astype(int), (np.array(self.y_preds_A2_mean)>acc_t).astype(int))
         self.rand_int_for_mos = [*range(len(self.y_true_A2_mean))]; shuffle(self.rand_int_for_mos)
+        self.score_dist_avg, self.score_dist_5 = self.plot_histogram_of_scores(self.y_true, self.y_preds)
         # pdb.set_trace()
         # self.epoch_loss_P1 = self.running_loss_P1 / n_batches
         # self.epoch_acc_P1 = accuracy_score((np.array(self.y_true_P1) > 0.5).astype(int), (np.array(self.y_preds_P1)> 0.5).astype(int))
@@ -124,4 +126,25 @@ class A2_Visualizer(MTL_Visualizer):
         else:
             return False
 
+
+    def plot_histogram_of_scores(self, true, preds):
+        true = torch.stack(true)
+        preds = torch.stack(preds)
+        mean_true = true.mean(dim=0)
+        mean_pred = preds.mean(dim=0)
+
+        score_dist_avg = plt.figure()
+        plt.bar(range(10), mean_true, align='center', width=0.5, label='True', facecolor='#FFC6D0', alpha=1)
+        plt.bar(range(10), mean_pred, align='edge', width=0.5, label='Predicted', facecolor='#789CCE', alpha=0.75)
+        plt.legend()
+        plt.ylim([0,0.5])
+
+        score_dist_5 = plt.figure(figsize=(23.0, 4.8))
+        for i in range(5):
+            plt.subplot(1,5,i+1)
+            plt.bar(range(10), true[self.rand_int_for_mos[i]], width=0.5, align='center', label='True', facecolor='#8BBEE8FF', alpha=1)
+            plt.bar(range(10), preds[self.rand_int_for_mos[i]], width=0.5, label='Predicted', align='edge', facecolor='#A8D5BAFF', alpha=0.75)
+            plt.legend()
+            plt.ylim([0, 0.5])
+        return score_dist_avg, score_dist_5
 

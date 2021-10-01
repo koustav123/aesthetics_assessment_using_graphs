@@ -96,6 +96,10 @@ class AIAG_Loss_1(nn.Module):
                 self.compute_average_scores(self.iter_results['y_preds_A2_mean']), \
                 self.compute_average_scores(self.iter_results['y_preds_A2_std'])
 
+        #added for hitogram visualization
+
+        self.iter_results['y_true'], self.iter_results['y_preds'] = targets_A2.cpu(), outputs['A2'].data.cpu()
+        # pdb.set_trace()
         return self.iter_results
 
     def compute_mean_std_mos(self, x ):

@@ -67,6 +67,8 @@ class MTL_Visualizer(SummaryWriter):
         self.y_preds_A200 = []
         self.y_true_A1 = []
         self.y_preds_A1 = []
+        self.y_true = []
+        self.y_preds = []
         self.y_true_A2_mean = []
         self.y_preds_A2_mean = []
 

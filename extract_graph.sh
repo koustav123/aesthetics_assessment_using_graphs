@@ -10,10 +10,12 @@ EXPERIMENT_ID=Extraction
 DB=meta/A2P2_FULL_Corrected.CSV
 
 #Path to AVA images.
-DATAPATH=/path/to/images/
+#DATAPATH=/media/koustav/Naihati/Dataset/AVADataSet/
+DATAPATH=/home/ghosalk/Datasets/AVADataSet/
 
 #Directory to store the features.
-SAVE_FEAT=dump/
+#SAVE_FEAT=/media/koustav/Naihati/Dataset/AVA/Features_8_5x5/
+SAVE_FEAT=/data2/ghosalk/AVA/Features_8_5x5
 
 #Feature File Name
 FEAT_FILE_NAME=INC_RN_V2.h5
@@ -25,9 +27,9 @@ BASE_MODEL=inceptionresnetv2
 FP=16
 
 #Number of images to extract features from. Use -1 if all images are to be used. Use a smaller value for debugging.
-PILOT=1000
+PILOT=-1
 
- CUDA_VISIBLE_DEVICES=1 python3 -W ignore extract_graph.py --id $ID --db $DB --datapath $DATAPATH --pretrained --exp_id $EXPERIMENT_ID --feature_file_name $FEAT_FILE_NAME\
+ CUDA_VISIBLE_DEVICES=0 python3 -W ignore extract_graph.py --id $ID --db $DB --datapath $DATAPATH --pretrained --exp_id $EXPERIMENT_ID --feature_file_name $FEAT_FILE_NAME\
   --base_model $BASE_MODEL \
   --data_precision $FP \
   --save_feat $SAVE_FEAT --pilot $PILOT --n_workers 4

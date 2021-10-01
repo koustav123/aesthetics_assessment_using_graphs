@@ -204,7 +204,10 @@ class AIAG_Dataset(AIAG_Dataset_Pandas):
         try:
             img = self.loader(path)
         except FileNotFoundError:
-            #print("Image not found: %s"%(path))
+            print("Image not found: %s"%(path))
+            return
+        except OSError:
+            print("Image corrupted: %s"%(path))
             return
         if self.transform is not None:
             img = self.transform(img)
