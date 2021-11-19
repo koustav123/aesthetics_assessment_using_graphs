@@ -1,6 +1,7 @@
 import sys
 import torch
 import Custom_Dataset
+import AADB_Dataset
 # import pdb
 # from torch.utils.data import WeightedRandomSampler
 # from torch_geometric.data import DataLoader as Dataloader_G
@@ -24,7 +25,19 @@ def load_data_loader(args, db, data_transforms, target_transforms):
         #pdb.set_trace()
         dsets = {x: Custom_Dataset.AIAG_Dataset_PyTorch_HDF5_MLSP_3(x, args, \
                                                   transform=data_transforms[x]) for x in ['train', 'test']}
+    elif args.id in ['AADB_AIAG_Extraction']:
+        #pdb.set_trace()
+        dsets = {x: AADB_Dataset.AIAG_Dataset(x, args, \
+            transform = data_transforms[x]) for x in ['train', 'test']}
 
+    elif args.id in ['AADB_AIAG']:
+        #pdb.set_trace()
+        dsets = {x: AADB_Dataset.AIAG_Dataset_PyTorch_HDF5_MLSP_3(x, args, \
+                                                  transform=data_transforms[x]) for x in ['train', 'test']}
+    elif args.id in ['AADB_AIAG_RGB']:
+        #pdb.set_trace()
+        dsets = {x: AADB_Dataset.AIAG_Dataset(x, args, \
+            transform = data_transforms[x]) for x in ['train', 'test']}
     else:
         print('Task ID is wrong or not specified in dataloader: %s'%(args.id))
         exit()

@@ -62,6 +62,7 @@ def extract_HDF5():
                 torch.cuda.empty_cache()
                 pbar_epoch = tqdm(dset_loaders[phase], position=1, leave=False, unit=' batches')
                 for count, data in enumerate(pbar_epoch):
+                    # pdb.set_trace()
                     if data:
                         inputs, labels, ids = data;
                         # pdb.set_trace()
@@ -71,7 +72,7 @@ def extract_HDF5():
                         feat = torch.cat([F.interpolate(i, size=(h,w), mode='area') for i in outputs],
                                       dim=1)
                         for c, g in enumerate(data_groups):
-                            dset = feature_file[g].create_dataset(ids[0], feat[c].size(), dtype="float16")
+                            dset = feature_file[g].create_dataset(ids[0], feat[c].size(), dtype="float"+str(args.data_precision))
                             dset[...] = feat[c].cpu().numpy()
 
         feature_file.close()

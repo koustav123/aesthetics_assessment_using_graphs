@@ -3,9 +3,9 @@ import Inception_ResNet_V2_Base, Graph_Models
 from termcolor import colored
 
 def load(args, dset_classes):
-    if args.id in ['AIAG', 'AIAG_Extraction']:
+    if args.id in ['AIAG', 'AIAG_Extraction', 'AADB_AIAG_Extraction', 'AADB_AIAG']:
         if args.base_model == 'inceptionresnetv2':
-            if args.id in ['AIAG_Extraction']:
+            if args.id in ['AIAG_Extraction', 'AADB_AIAG_Extraction']:
                 model = Inception_ResNet_V2_Base.inceptionresnetv2()
             else:
                 # Specify the particular baseline model
@@ -13,6 +13,8 @@ def load(args, dset_classes):
         else:
             print('Wrong model specified: %s' % (args.base_model))
             exit(1)
+    elif args.id in ['AADB_AIAG_RGB']:
+        model = getattr(Graph_Models, args.model_name)(args)
     else:
         print('Wrong id specified: %s' % (args.id))
         exit(1)

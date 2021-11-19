@@ -50,7 +50,7 @@ criterion = lm.load(args)
 if args.optimizer == "SGD":
     optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=0.9)
 elif args.optimizer == "ADAM":
-    optimizer = optim.Adam(model.parameters(), lr=args.lr, eps=1e-8, weight_decay=0)
+    optimizer = optim.Adam(model.parameters(), lr=args.lr)
 else:
     print("Correct optimizer not specified %s" % args.optimizer)
     exit()
@@ -61,6 +61,7 @@ if args.start_from is not None:
 
 # learning rate scheduler
 scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lambda epoch: (1 - epoch / args.num_epochs) ** 2.5)
+# scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size = 10, gamma = 0.5)
 
 # Model and visuals save path
 model_path = args.save + 'Exp-' + args.exp_id + '_' + datetime.datetime.now().strftime("%I_%M%p_%B_%d_%Y") + '.model'
@@ -81,7 +82,7 @@ def train():
             visualizer.init_running_results()
             model.set_training_mode(phase, epoch)
             if phase == 'test' and not epoch % args.val_after_every == 0:
-                scheduler.step()
+                # scheduler.step()
                 continue
 
             pbar_epoch = tqdm(dset_loaders[phase], position=1, leave=False, unit=' batches')
@@ -90,6 +91,8 @@ def train():
                 inputs.x = inputs.x.cuda();
                 inputs.batch = inputs.batch.cuda()
                 inputs.pos = inputs.pos.cuda().float()
+                # pdb.set_trace()
+                # inputs = inputs.cuda()
 
                 if phase == 'train':
                     optimizer.zero_grad()
@@ -104,7 +107,10 @@ def train():
 
                 visualizer.update_running_results(iter_results, phase)
             visualizer.compute_epoch_results(len(dset_loaders[phase]))
+            visualizer.plot_grad_flow(model.named_parameters())
             visualizer.epoch_write(epoch, phase)
+            scheduler.step()
+
 
             if phase == 'test':
                 epoch_loss = visualizer.get_val_loss()
@@ -116,7 +122,7 @@ def train():
                                 'optimizer': optimizer.state_dict()
                             }
                             torch.save(checkpoint, f);
-                scheduler.step()
+                # scheduler.step()
     return 1
 
 

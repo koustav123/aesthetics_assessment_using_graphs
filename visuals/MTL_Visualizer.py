@@ -159,10 +159,10 @@ class MTL_Visualizer(SummaryWriter):
         class_names = class_list[:,1]
         return dict(zip(indices, class_names))
         
-    def plot_mos(self, y_true, y_preds):
+    def plot_mos(self, y_true, y_preds, x_lim = 10, y_lim = 10):
         plt.scatter(y_true, y_preds, s=2.0 )
-        plt.xlim([0,10])
-        plt.ylim([0,10])
+        plt.xlim([0,x_lim])
+        plt.ylim([0,y_lim])
         plt.grid(True)
         plt.xlabel('True MOS')
         plt.ylabel('Predicted MOS')
