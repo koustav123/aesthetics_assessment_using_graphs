@@ -17,7 +17,7 @@ DB=meta/AADB_dataset.csv
 #DATAPATH=/home/ghosalk/Datasets/AVADataSet/
 DATAPATH=/data2/AADB/images/datasetImages_originalSize/
 #Path to save the trained models
-SAVE=/data2/ghosalk/AVA/models/
+SAVE=/data2/ghosalk/AADB/models/
 
 #Path to save tensorboard files
 SAVE_VISUALS=/data2/ghosalk/AVA/visuals/

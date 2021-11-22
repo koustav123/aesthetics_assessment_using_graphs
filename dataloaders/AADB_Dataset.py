@@ -64,7 +64,10 @@ class AIAG_Dataset_Pandas(data.Dataset):
     def select_K_test_samples(self, ids):
         # pdb.set_trace()
         #train_idxs = ids[ids['set_x'] != 'test']
-        test_idxs = ids[ids['NO'] > 8958]
+        if self.pilot == -1:
+            test_idxs = ids[ids['NO'] > 8958]
+        else:
+            test_idxs = ids[ids['NO'] > ids.shape[0] - self.pilot]
         # # test_idxs = test_idxs[test_idxs['set_x'] != 'validation']
         # # test_idxs = test_idxs[test_idxs['set_y'] != 'training']
         #
@@ -203,7 +206,12 @@ class AIAG_Dataset(AIAG_Dataset_Pandas):
         imgs = [os.path.join(self.root,i) for i in img_names]
         # labels = ids[[str(i) for i in range(1,11)]].values
         # normed_labels = labels/ np.abs(labels.sum(axis =1)[:,None])
-        labels = ids['meanScore'].values
+        if self.args.A2_D == 1:
+            labels = ids['meanScore'].values / 5.0
+        elif self.args.A2_D == 2:
+            labels = [*zip(ids['meanScore'].values / 5.0, ids['stdScore'].values)]
+        elif self.args.A2_D == 5:
+            labels = [[*map(float, v.split('$'))] for v in ids['scoreHist'].values]
         img_labels = [*zip(imgs, labels, img_names)]
         class_count = {'A2': self.args.A2_D}
         classes = range(self.args.A2_D)
@@ -224,7 +232,7 @@ class AIAG_Dataset(AIAG_Dataset_Pandas):
             img = self.transform(img)
         if self.target_transform is not None:
             target = self.target_transform(target)
-        return  img, target/5.0, ids
+        return  img, target, ids
         #return
 
     def collate(self, batch):

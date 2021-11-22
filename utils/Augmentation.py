@@ -46,17 +46,17 @@ class Augmentation:
             ]),
         }
 
-        elif self.strategy == "S":  # Random Crops of 224
+        elif self.strategy == "RRC":  # Random Resized Crops of 224
             data_transforms = {
             'train': transforms.Compose([
-                transforms.Resize([224, 224]),
-                # transforms.RandomHorizontalFlip(),
+                transforms.RandomResizedCrop(332),
+                transforms.RandomHorizontalFlip(),
                 transforms.ToTensor(),
                 transforms.Normalize(MEAN, STD)
             ]),
 
             'test': transforms.Compose([
-                transforms.RandomCrop(224),
+                transforms.Resize([332, 332]),
                 transforms.ToTensor(),
                 transforms.Normalize(MEAN, STD)
             ]),

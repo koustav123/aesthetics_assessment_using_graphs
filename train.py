@@ -60,9 +60,10 @@ if args.start_from is not None:
     print(colored('Pre-trained optimizer and amp loaded', 'cyan'))
 
 # learning rate scheduler
-scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lambda epoch: (1 - epoch / args.num_epochs) ** 2.5)
+# scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lambda epoch: (1 - epoch / args.num_epochs) ** 2.5)
 # scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size = 10, gamma = 0.5)
-
+scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.1,
+                                                       patience=3, min_lr=1e-8, verbose=True)
 # Model and visuals save path
 model_path = args.save + 'Exp-' + args.exp_id + '_' + datetime.datetime.now().strftime("%I_%M%p_%B_%d_%Y") + '.model'
 print(colored("Visual path: " + args.save_visuals + 'Exp: ' + args.exp_id +
@@ -71,28 +72,31 @@ print(colored("Visual path: " + args.save_visuals + 'Exp: ' + args.exp_id +
 
 # main training method
 def train():
+    # pdb.set_trace()
     epoch_loss = np.Inf
     pbar_total = tqdm(range(args.num_epochs), position=0, leave=True, unit=' epochs')
     for epoch in pbar_total:
         criterion.set_epoch_count(epoch)  # Done to adjust loss weights based on epochs
         pbar_total.set_description(
             'Epoch {}/{} || Val Loss: {:0.5f} || LR: {:.2E}'.format(epoch + 1, args.num_epochs, epoch_loss,
-                                                                    scheduler.get_lr()[0]))
+                                                                    [group['lr'] for group in optimizer.param_groups][-1]))
         for phase in ['train', 'test']:
             visualizer.init_running_results()
             model.set_training_mode(phase, epoch)
-            if phase == 'test' and not epoch % args.val_after_every == 0:
+            # if phase == 'test' and not epoch % args.val_after_every == 0:
                 # scheduler.step()
-                continue
+                # scheduler.step(visualizer.get_val_loss())
+                # continue
 
             pbar_epoch = tqdm(dset_loaders[phase], position=1, leave=False, unit=' batches')
+            pbar_epoch.set_description(phase)
             for count, data in enumerate(pbar_epoch):
                 inputs, labels, ids = data;
-                inputs.x = inputs.x.cuda();
-                inputs.batch = inputs.batch.cuda()
-                inputs.pos = inputs.pos.cuda().float()
+                # inputs.x = inputs.x.cuda();
+                # inputs.batch = inputs.batch.cuda()
+                # inputs.pos = inputs.pos.cuda().float()
                 # pdb.set_trace()
-                # inputs = inputs.cuda()
+                inputs = inputs.cuda()
 
                 if phase == 'train':
                     optimizer.zero_grad()
@@ -109,11 +113,12 @@ def train():
             visualizer.compute_epoch_results(len(dset_loaders[phase]))
             visualizer.plot_grad_flow(model.named_parameters())
             visualizer.epoch_write(epoch, phase)
-            scheduler.step()
+            # scheduler.step(visualizer.get_val_loss())
 
 
             if phase == 'test':
                 epoch_loss = visualizer.get_val_loss()
+                scheduler.step(epoch_loss)
                 if visualizer.checkpoint():
                     if args.pilot == -1:
                         with open(model_path + '_best', 'wb') as f:

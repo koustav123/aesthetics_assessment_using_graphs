@@ -91,7 +91,7 @@ class AIAG_Loss_1(nn.Module):
         self.iter_results['y_preds_A2_mean'], self.iter_results['y_preds_A2_std'] = \
             outputs['A2'].data.cpu().tolist(), outputs['A2'].data.cpu().tolist()
 
-        if phase == 'test':
+        if phase == 'test' and 'RGB' not in self.args.id:
             self.iter_results['y_true_A2_mean'], self.iter_results['y_true_A2_std'] = \
                 self.compute_average_scores(self.iter_results['y_true_A2_mean']), \
                 self.compute_average_scores(self.iter_results['y_true_A2_std'])

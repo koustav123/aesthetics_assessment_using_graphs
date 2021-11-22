@@ -5,6 +5,8 @@ from torch_geometric.nn import GCNConv, global_mean_pool, GATConv, GlobalAttenti
 from Base_Models import GATTP, GATTP_1
 import pdb
 from torchvision import models
+import pretrainedmodels
+import Inception_ResNet_V2_Base
 
 
 class Identity(nn.Module):
@@ -192,3 +194,32 @@ class GAT_x3_GATP_MH(Graph_Base):
         x = self.lin3(x)
         # pdb.set_trace()
         return {'A2': x.squeeze(1)}
+
+class InceptionResnetV2(Graph_Base):
+    def __init__(self, args, pt='imagenet'):
+        super(InceptionResnetV2, self).__init__()
+        # pdb.set_trace()
+        self.trunk = pretrainedmodels.__dict__['inceptionresnetv2'](num_classes=1000, pretrained=pt)
+        self.cap = nn.Linear(self.trunk.last_linear.in_features, args.A2_D)
+        self.trunk.last_linear = Identity()
+
+    def forward(self, x, phase):
+        # pdb.set_trace()
+        x = self.trunk(x)
+        x = self.cap(x)
+        return {'A2': x.squeeze(1)}
+
+class InceptionResnetV2Hierarchial(Graph_Base):
+    def __init__(self, args, pt='imagenet'):
+        super(InceptionResnetV2Hierarchial, self).__init__()
+        # pdb.set_trace()
+        self.trunk = Inception_ResNet_V2_Base.inceptionresnetv2()
+        self.cap = nn.Linear(self.trunk.last_linear.in_features, args.A2_D)
+        self.trunk.last_linear = Identity()
+
+    def forward(self, x, phase):
+        pdb.set_trace()
+        x = self.trunk(x)
+        x = self.cap(x)
+        return {'A2': x.squeeze(1)}
+
